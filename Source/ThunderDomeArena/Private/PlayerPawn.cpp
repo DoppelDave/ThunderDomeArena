@@ -28,6 +28,37 @@ APlayerPawn::APlayerPawn()
 	Playerdata.fHealth = 50.0f;
 
 	//m_pCharacterMovement = GetCharacterMovement();
+	static ConstructorHelpers::FClassFinder<UUserWidget>HUDWidgetClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/WP_Crosshair'"));
+	HUDWidgetClass = HUDWidgetClassFinder.Class;
+	if (HUDWidgetClass)
+	{
+		// Erzeuge eine Instanz des Widgets
+		CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetClass);
+
+		// Füge das Widget dem Viewport hinzu
+		if (CrosshairWidget)
+		{
+			CrosshairWidget->AddToViewport();
+		}
+	}
+
+	CollisionComponent = CreateDefaultSubobject<UBoxComponent> (TEXT("CollisionComponent"));
+	CollisionComponent->SetupAttachment(RootComponent);
+	//	m_pTriggerBox->SetBoxExtent(FVector(500.0f, 500.0f, 500.0f));
+	CollisionComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	//RootComponent = CollisionComponent;
+	CollisionComponent->SetBoxExtent(FVector(20.0f, 20.0f, 20.0f));
+	CollisionComponent->SetSimulatePhysics(true);
+}
+
+bool APlayerPawn::CanMove()
+{
+	return m_bCanMove;
+}
+
+void APlayerPawn::SetCanMove(bool a_bCanMove)
+{
+	m_bCanMove = a_bCanMove;
 }
 
 
@@ -203,6 +234,11 @@ void APlayerPawn::EnableShooting()
 	m_bCanShoot = true;
 }
 
+void APlayerPawn::DisableShooting()
+{
+	m_bCanShoot = false;
+}
+
 float APlayerPawn::GetHealth() const
 {
 	return Playerdata.fHealth;
@@ -224,10 +260,17 @@ void APlayerPawn::GetMousePositions()
 
 
 	//FRotator NewCameraRotation = FRotator(0,m_fMousePosX, 0.0f);
+	float minAngle = -20.0f;
+	float maxAngle = 40.0f;
+	float ClampedMousePosY = FMath::Clamp(m_fMousePosY + m_fRecoilAngle, minAngle, maxAngle);
+	FRotator NewCameraRotation = FRotator(0, m_fMousePosX, ClampedMousePosY-10.0f);
 
-	FRotator NewCameraRotation = FRotator(0, m_fMousePosX, m_fRecoilAngle);
+	//FRotator NewCameraRotation = FRotator(0, m_fMousePosX,FMath::Clamp(m_fMousePosY+m_fRecoilAngle, minAngle, maxAngle));
+
+	FRotator NewWeaponRotation = FRotator(0, NewCameraRotation.Yaw, 0);
 
 	m_pMesh_WeaponHolder->SetRelativeRotation(NewCameraRotation);
+	//m_pCamera->SetRelativeRotation(FRotator(0, 0, 0));
 
 	m_fRecoilAngle -= m_fRecoilDecreaseRate * GetWorld()->GetDeltaSeconds();
 	m_fRecoilAngle = FMath::Max(m_fRecoilAngle, 0.0f);
@@ -240,6 +283,11 @@ void APlayerPawn::GetMousePositions()
 void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	m_bCanMove = false;
+	DisableShooting();
+	
+	m_pGameDataManager = UGameDataManager::Instantiate(*this);
 
 	m_pInput->SetViewTarget(this);
 
@@ -260,22 +308,42 @@ void APlayerPawn::BeginPlay()
 			CrosshairWidgetInstance->AddToViewport();
 		}
 	}
+
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
 }
 
 // Called every frame
 void APlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	MovePlayer(DeltaTime);
+
+	/*if (m_bCanMove)
+	{
+		MovePlayer(DeltaTime);
+	}*/
+
+	if (m_pGameDataManager)
+	{
+		if (!m_pGameDataManager->GetIsPaused())
+		{
+			MovePlayer(DeltaTime);
+			EnableShooting();
+		}
+	}
+
 	GetMousePositions();
 
-	/*if (CrosshairWidgetInstance)
+	if (CrosshairWidgetInstance)
 	{
 		FVector2D ViewportSize;
 		GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
 		FVector2D CrosshairPosition = FVector2D(ViewportSize.X / 2.0f, ViewportSize.Y / 2.0f);
 		CrosshairWidgetInstance->SetPositionInViewport(CrosshairPosition);
-	}*/
+	}
 }
 
 void APlayerPawn::OnPickUpEvent()

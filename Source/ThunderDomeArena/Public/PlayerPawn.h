@@ -9,6 +9,8 @@
 #include "../Public/InputController.h"
 #include "Sound/SoundCue.h"
 #include "FPlayerData.h"
+#include "GameDataManager.h"
+#include "Components/BoxComponent.h"
 #include "PlayerPawn.generated.h"
 
 UCLASS()
@@ -19,6 +21,12 @@ class THUNDERDOMEARENA_API APlayerPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	APlayerPawn();
+
+	UFUNCTION()
+	bool CanMove();
+
+	UFUNCTION()
+	void SetCanMove(bool a_bCanMove);
 
 	UPROPERTY(EditAnywhere, BLueprintReadOnly, Category = "PlayerData")
 	FPlayerData Playerdata;
@@ -49,7 +57,14 @@ private:
 	void GetMousePositions();
 	void ShootBullets();
 
+	UPROPERTY()
+	TSubclassOf<UUserWidget> HUDWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* CrosshairWidget;
+
 	void EnableShooting();
+	void DisableShooting();
 
 	UFUNCTION(BlueprintCallable, Category = "Player Data")
 	float GetHealth() const;
@@ -60,6 +75,12 @@ private:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY()
+	UGameDataManager* m_pGameDataManager;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CollisionBox")
+	UBoxComponent* CollisionComponent;
 
 public:
 	// Called every frame
@@ -104,7 +125,7 @@ private:
 	FTimerHandle ShotTimerHandle;
 	float m_fShotCooldown = 0.5f;
 	bool m_bCanShoot = true;
-
+	bool m_bCanMove = true;
 
 	float m_fMousePosX;
 	float m_fMousePosY;

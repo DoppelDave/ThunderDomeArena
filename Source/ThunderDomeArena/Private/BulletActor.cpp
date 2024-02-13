@@ -44,7 +44,7 @@ UStaticMeshComponent* ABulletActor::InitBaseMesh(void)
 	pMesh_Base->SetStaticMesh(FindObject<UStaticMesh>(*M_S_MESH_BULLET));
 	pMesh_Base->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	pMesh_Base->SetMaterial(0, m_pMaterial);
-	pMesh_Base->SetWorldScale3D(FVector(0.3f, 0.3f, 0.3f));
+	pMesh_Base->SetWorldScale3D(FVector(5.3f, 5.3f, 5.3f));
 	//CreateTrigger(pMesh_Base);
 	return pMesh_Base;
 }
