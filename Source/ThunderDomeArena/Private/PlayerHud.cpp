@@ -4,7 +4,7 @@
 
 APlayerHud::APlayerHud()
 {
-	static ConstructorHelpers::FClassFinder<UUserWidget>HUDWidgetClassFinder(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/BP_GameHUD.BP_GameHUD'"));
+	static ConstructorHelpers::FClassFinder<UUserWidget>HUDWidgetClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/BP_GameHUD'"));
 	HUDWidgetClass = HUDWidgetClassFinder.Class;
     if (HUDWidgetClass)
     {

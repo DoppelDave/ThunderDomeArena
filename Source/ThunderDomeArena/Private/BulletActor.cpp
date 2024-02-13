@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "ActorUtils.h"
-#include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
 #include "BulletActor.h"
 
 // Sets default values
@@ -16,10 +16,10 @@ ABulletActor::ABulletActor()
 
 }
 
-void ABulletActor::OnBulletHit(UPrimitiveComponent* HitComonent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Hier ist eine Nachricht, die in der Konsole angezeigt wird!"));
-}
+//void ABulletActor::OnBulletHit(UPrimitiveComponent* HitComonent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+//{
+//	UE_LOG(LogTemp, Warning, TEXT("Hier ist eine Nachricht, die in der Konsole angezeigt wird!"));
+//}
 
 
 void ABulletActor::InitMaterial(void)
@@ -27,14 +27,14 @@ void ABulletActor::InitMaterial(void)
 	m_pMaterial = FindObject<UMaterialInterface>(*M_S_MAT);
 }
 
-void ABulletActor::CreateTrigger(UStaticMeshComponent* a_pMesh)
-{
-	m_pTriggerBox = CreateDefaultSubobject<USphereComponent>(TEXT("TriggerBox"));
-	m_pTriggerBox->SetupAttachment(a_pMesh);
-	m_pTriggerBox->InitSphereRadius(10.0f);
-	m_pTriggerBox->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	m_pTriggerBox->OnComponentHit.AddDynamic(this, &ABulletActor::OnBulletHit);
-}
+//void ABulletActor::CreateTrigger(UStaticMeshComponent* a_pMesh)
+//{
+//	m_pTriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
+//	m_pTriggerBox->SetupAttachment(a_pMesh);
+//	m_pTriggerBox->SetBoxExtent(FVector(500.0f, 500.0f, 500.0f));
+//	m_pTriggerBox->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+//	m_pTriggerBox->OnComponentHit.AddDynamic(this, &ABulletActor::OnBulletHit);
+//}
 
 UStaticMeshComponent* ABulletActor::InitBaseMesh(void)
 {
@@ -45,7 +45,7 @@ UStaticMeshComponent* ABulletActor::InitBaseMesh(void)
 	pMesh_Base->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	pMesh_Base->SetMaterial(0, m_pMaterial);
 	pMesh_Base->SetWorldScale3D(FVector(0.3f, 0.3f, 0.3f));
-	CreateTrigger(pMesh_Base);
+	//CreateTrigger(pMesh_Base);
 	return pMesh_Base;
 }
 

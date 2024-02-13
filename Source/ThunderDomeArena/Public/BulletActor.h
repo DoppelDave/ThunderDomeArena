@@ -15,12 +15,12 @@ public:
 	// Sets default values for this actor's properties
 	ABulletActor();
 	
-	UFUNCTION()
-	void OnBulletHit(UPrimitiveComponent* HitComonent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	//UFUNCTION()
+	//void OnBulletHit(UPrimitiveComponent* HitComonent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 private:
 	void InitMaterial(void);
-	void CreateTrigger(UStaticMeshComponent* a_pMesh);
+	//void CreateTrigger(UStaticMeshComponent* a_pMesh);
 	UStaticMeshComponent* InitBaseMesh(void);
 
 protected:
@@ -37,7 +37,7 @@ private:
 	const FString M_S_MESH_BULLET = TEXT("/Script/Engine.StaticMesh'/Game/Meshes/Bullet.Bullet'");
 	const FString M_S_MESH_BULLET_NAME = TEXT("Bullet");
 
-	class USphereComponent* m_pTriggerBox;
+	//class UBoxComponent* m_pTriggerBox;
 
 	// Materials & Meshes
 	UPROPERTY(EditAnywhere,

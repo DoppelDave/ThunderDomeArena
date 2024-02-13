@@ -24,7 +24,7 @@ void ABoxActor::InitComponents()
 
 void ABoxActor::CreateTrigger(UStaticMeshComponent* a_pMesh)
 {
-	m_pTriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
+	m_pTriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBoxBox"));
 	m_pTriggerBox->SetupAttachment(a_pMesh);
 	m_pTriggerBox->SetBoxExtent(FVector(500.0f, 500.0f, 500.0f));
 	m_pTriggerBox->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
