@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 #include "../Public/InputController.h"
@@ -14,19 +14,13 @@
 #include "PlayerPawn.generated.h"
 
 UCLASS()
-class THUNDERDOMEARENA_API APlayerPawn : public APawn
+class THUNDERDOMEARENA_API APlayerPawn : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
 	APlayerPawn();
-
-	UFUNCTION()
-	bool CanMove();
-
-	UFUNCTION()
-	void SetCanMove(bool a_bCanMove);
 
 	UPROPERTY(EditAnywhere, BLueprintReadOnly, Category = "PlayerData")
 	FPlayerData Playerdata;
@@ -41,6 +35,11 @@ private:
 	class UCameraComponent* InitCamera(void);
 	void InitComponents(void);
 	void MovePlayer(float a_fDeltaTime);
+	void InitCrosshair(void);
+	void UpdateCrosshair(void);
+	void EnableShooting();
+	void EnableMovement();
+	void ShootBullets();
 
 
 	// Callbacks
@@ -55,7 +54,6 @@ private:
 	void AimAction();
 	UFUNCTION()
 	void GetMousePositions();
-	void ShootBullets();
 
 	UPROPERTY()
 	TSubclassOf<UUserWidget> HUDWidgetClass;
@@ -63,8 +61,7 @@ private:
 	UPROPERTY()
 	UUserWidget* CrosshairWidget;
 
-	void EnableShooting();
-	void DisableShooting();
+	
 
 	UFUNCTION(BlueprintCallable, Category = "Player Data")
 	float GetHealth() const;
@@ -96,6 +93,7 @@ private:
 	const FString M_S_MAT_DEC = TEXT("/Script/Engine.Material'/Game/Materials/M_Basic_Floor.M_Basic_Floor'");
 	const FString M_S_MAT_WIN = TEXT("/Script/Engine.Material'/Game/Materials/M_Basic_Floor.M_Basic_Floor'");
 
+	const FString M_S_CROSSHAIR = TEXT("WidgetBlueprint'/Game/Blueprints/WP_Crosshair'");
 	const FString M_S_MESH_BASE = TEXT("/Script/Engine.StaticMesh'/Game/Meshes/Car.Car'");
 	const FString M_S_MESH_WEAPON_BASE = TEXT("/Script/Engine.StaticMesh'/Game/Meshes/Weapon_Weapon_Holder.Weapon_Weapon_Holder'");
 	const FString M_S_MESH_WEAPON = TEXT("/Script/Engine.StaticMesh'/Game/Meshes/Weapon_Weapon.Weapon_Weapon'");
@@ -107,23 +105,21 @@ private:
 	const FString M_S_MESH_WEAPON_NAME = TEXT("Weapon");
 	const FString M_S_MESH_WEAPON_2_NAME = TEXT("Weapon2");
 	const FString M_S_MESH_BULLET_NAME = TEXT("Bullet");
-
+	const FString M_S_CAMERA_NAME = TEXT("Camera");
 	const FString M_S_SHOOT_SOUND = TEXT("/Script/Engine.SoundWave'/Game/Audio/miniGun_Shoot.miniGun_Shoot'");
 
 	// member
-
 	FVector m_cameraLocation = FVector(0.0f, -300.0f, 150.0f);
 	FRotator m_cameraRotation = FRotator(0.0f, 90.0f, 0.0f);
 
 	//Movement
 	FVector m_direction = FVector(0.0f, 0.0f, 0.0f);
 	FRotator m_baseRotation = FRotator(0.0f, 0.0f, 0.0f);
-	FRotator m_weaponRotation = FRotator(0.0f, 0.0f, 0.0f);
 
 	//UStaticMeshComponent* m_pMesh_WeaponHolder;
 	UCameraComponent* m_PCamera;
 	FTimerHandle ShotTimerHandle;
-	float m_fShotCooldown = 0.5f;
+	float m_fShotCooldown = 0.1f;
 	bool m_bCanShoot = true;
 	bool m_bCanMove = true;
 
@@ -140,7 +136,7 @@ private:
 
 	UPROPERTY(EditAnywhere,
 		meta = (DisplayName = "MovementSpeed", Category = "Movement"))
-	float m_fSpeed = 200.0f;
+	float m_fSpeed = 400.0f;
 
 	UPROPERTY(EditAnywhere,
 		meta = (DisplayName = "MovementSpeed", Category = "Movement"))

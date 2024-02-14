@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "PlayerPawn.h"
 #include "ActorUtils.h"
 #include "BulletActor.h"
@@ -19,50 +16,14 @@ APlayerPawn::APlayerPawn()
 	PrimaryActorTick.bCanEverTick = true;
 
 	m_pInput = Cast<AInputController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
 	InitComponents();
+	InitCrosshair();
 
-	if (m_fSpeed == 0.0f) m_fSpeed = 400.0f;
-	m_fShotCooldown = 0.1f;
-	m_bCanShoot = true;
-
-	Playerdata.fHealth = 50.0f;
-
-	//m_pCharacterMovement = GetCharacterMovement();
-	static ConstructorHelpers::FClassFinder<UUserWidget>HUDWidgetClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/WP_Crosshair'"));
-	HUDWidgetClass = HUDWidgetClassFinder.Class;
-	if (HUDWidgetClass)
-	{
-		// Erzeuge eine Instanz des Widgets
-		CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetClass);
-
-		// Füge das Widget dem Viewport hinzu
-		if (CrosshairWidget)
-		{
-			CrosshairWidget->AddToViewport();
-		}
-	}
-
-	CollisionComponent = CreateDefaultSubobject<UBoxComponent> (TEXT("CollisionComponent"));
-	CollisionComponent->SetupAttachment(RootComponent);
-	//	m_pTriggerBox->SetBoxExtent(FVector(500.0f, 500.0f, 500.0f));
-	CollisionComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	//RootComponent = CollisionComponent;
-	CollisionComponent->SetBoxExtent(FVector(20.0f, 20.0f, 20.0f));
-	CollisionComponent->SetSimulatePhysics(true);
+	
 }
 
-bool APlayerPawn::CanMove()
-{
-	return m_bCanMove;
-}
-
-void APlayerPawn::SetCanMove(bool a_bCanMove)
-{
-	m_bCanMove = a_bCanMove;
-}
-
-
-
+#pragma region InitComponents
 void APlayerPawn::InitMaterials(void)
 {
 	// Instanzierung
@@ -88,7 +49,6 @@ UStaticMeshComponent* APlayerPawn::InitBaseMesh(void)
 
 UStaticMeshComponent* APlayerPawn::InitWeapon2Mesh(void)
 {
-
 	//Instanziierung
 	auto pMesh_Weapon_2 = CreateDefaultSubobject<UStaticMeshComponent>(*M_S_MESH_WEAPON_2_NAME);
 	//Initialisierung
@@ -105,7 +65,6 @@ UStaticMeshComponent* APlayerPawn::InitWeapon2Mesh(void)
 
 UStaticMeshComponent* APlayerPawn::InitWeaponBaseMesh(void)
 {
-
 	//Instanziierung
 	auto pMesh_WeaponHolder = CreateDefaultSubobject<UStaticMeshComponent>(*M_S_MESH_WEAPON_BASE_NAME);
 
@@ -133,12 +92,9 @@ UStaticMeshComponent* APlayerPawn::InitWeaponMesh(void)
 	return pMesh_Weapon;
 }
 
-
-
-
 UCameraComponent* APlayerPawn::InitCamera(void)
 {
-	m_pCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	m_pCamera = CreateDefaultSubobject<UCameraComponent>(*M_S_CAMERA_NAME);
 	m_pCamera->SetupAttachment(m_pMesh_WeaponHolder);
 	m_pCamera->SetRelativeLocation(m_cameraLocation);
 	m_pCamera->SetRelativeRotationExact(m_cameraRotation);
@@ -156,28 +112,64 @@ void APlayerPawn::InitComponents(void)
 	if (!m_pMesh_2_Weapon) m_pMesh_2_Weapon = InitWeapon2Mesh();
 }
 
+void APlayerPawn::InitCrosshair(void)
+{
+	static ConstructorHelpers::FClassFinder<UUserWidget>HUDWidgetClassFinder(*M_S_CROSSHAIR);
+	HUDWidgetClass = HUDWidgetClassFinder.Class;
+	if (HUDWidgetClass)
+	{
+		CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetClass);
+
+		if (CrosshairWidget)
+		{
+			CrosshairWidget->AddToViewport();
+		}
+	}
+}
+#pragma endregion
+
 void APlayerPawn::MovePlayer(float a_fDeltaTime)
 {
-	auto rotation = GetActorRotation() + m_baseRotation * m_fRotationSpeed * a_fDeltaTime;
+	auto rotation = GetActorRotation() + (m_baseRotation * m_fRotationSpeed * a_fDeltaTime);
 	SetActorRotation(rotation);
 
-	FVector forwardVector = GetActorRightVector();
+	/*FRotator RotationToAdd(rotation);
+	FTransform CurrentTransform = m_pMesh_Base->GetComponentTransform();
+	FTransform NewTransform = FTransform(RotationToAdd) * CurrentTransform;
 
-	auto location = GetActorLocation() + forwardVector * m_fSpeed * a_fDeltaTime;
-	SetActorLocation(location);
+	m_pMesh_Base->SetWorldTransform(NewTransform);*/
+	//SetActorTransform(NewTransform);
+	
 
+
+	//FVector forwardVector = GetActorRightVector();
+
+	//auto location = GetActorLocation() + forwardVector * m_fSpeed * a_fDeltaTime;
+	//SetActorLocation(location);
 }
 
+
+
+void APlayerPawn::UpdateCrosshair(void)
+{
+	if (CrosshairWidgetInstance)
+	{
+		FVector2D ViewportSize;
+		GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
+		FVector2D CrosshairPosition = FVector2D(ViewportSize.X / 2.0f, ViewportSize.Y / 2.0f);
+		CrosshairWidgetInstance->SetPositionInViewport(CrosshairPosition);
+	}
+}
 
 void APlayerPawn::HandleForwardMoving(float a_fInput)
 {
 	if (a_fInput > 0)
 	{
-		m_fSpeed = 500.0f;
+		m_fSpeed = 1000.0f;
 	}
 	else if (a_fInput < 0)
 	{
-		m_fSpeed = -500.0f;
+		m_fSpeed = -1000.0f;
 	}
 	else
 	{
@@ -187,7 +179,7 @@ void APlayerPawn::HandleForwardMoving(float a_fInput)
 
 void APlayerPawn::HandleRightMoving(float a_fInput)
 {
-	m_baseRotation.Yaw = a_fInput;
+	//m_baseRotation.Yaw = a_fInput;
 }
 
 void APlayerPawn::OpenMenuAction()
@@ -198,12 +190,10 @@ void APlayerPawn::OpenMenuAction()
 
 void APlayerPawn::ShootAction()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Shoot"));
 	if (m_bCanShoot)
 	{
 		ShootBullets();
 		m_bCanShoot = false;
-		//GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &APlayerPawn::EnableShooting, ShotTimerHandle, false);
 		GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &APlayerPawn::EnableShooting, m_fShotCooldown, false);
 	}
 }
@@ -211,8 +201,6 @@ void APlayerPawn::ShootAction()
 void APlayerPawn::ShootBullets()
 {
 	USoundBase* LoadedSound = LoadObject<USoundBase>(nullptr, *M_S_SHOOT_SOUND);
-
-
 
 	FVector SpawnLocation = GetActorLocation();
 	FRotator SpawnRotation = m_pMesh_WeaponHolder->GetRelativeRotation();
@@ -229,14 +217,37 @@ void APlayerPawn::ShootBullets()
 	m_fRecoilAngle = m_fRecoilAmount;
 }
 
+void APlayerPawn::AimAction()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Aim"));
+}
+
+void APlayerPawn::GetMousePositions()
+{
+	m_pInput->GetMousePosition(m_fMousePosX, m_fMousePosY);
+
+	float minAngle = -20.0f;
+	float maxAngle = 40.0f;
+	float ClampedMousePosY = FMath::Clamp(m_fMousePosY + m_fRecoilAngle, minAngle, maxAngle);
+
+	FRotator NewCameraRotation = FRotator(0, m_fMousePosX, ClampedMousePosY - 10.0f);
+	//FRotator NewWeaponRotation = FRotator(0, NewCameraRotation.Yaw, 0);
+
+	m_pMesh_WeaponHolder->SetRelativeRotation(NewCameraRotation);
+
+	//m_fRecoilAngle -= m_fRecoilDecreaseRate * GetWorld()->GetDeltaSeconds();
+	//m_fRecoilAngle = FMath::Max(m_fRecoilAngle, 0.0f);
+}
+
+#pragma region Getter/Setter
 void APlayerPawn::EnableShooting()
 {
 	m_bCanShoot = true;
 }
 
-void APlayerPawn::DisableShooting()
+void APlayerPawn::EnableMovement()
 {
-	m_bCanShoot = false;
+	m_bCanMove = true;
 }
 
 float APlayerPawn::GetHealth() const
@@ -248,36 +259,7 @@ void APlayerPawn::SetHealth(float a_fHealth)
 {
 	Playerdata.fHealth = a_fHealth;
 }
-
-void APlayerPawn::AimAction()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Aim"));
-}
-
-void APlayerPawn::GetMousePositions()
-{
-	m_pInput->GetMousePosition(m_fMousePosX, m_fMousePosY);
-
-
-	//FRotator NewCameraRotation = FRotator(0,m_fMousePosX, 0.0f);
-	float minAngle = -20.0f;
-	float maxAngle = 40.0f;
-	float ClampedMousePosY = FMath::Clamp(m_fMousePosY + m_fRecoilAngle, minAngle, maxAngle);
-	FRotator NewCameraRotation = FRotator(0, m_fMousePosX, ClampedMousePosY-10.0f);
-
-	//FRotator NewCameraRotation = FRotator(0, m_fMousePosX,FMath::Clamp(m_fMousePosY+m_fRecoilAngle, minAngle, maxAngle));
-
-	FRotator NewWeaponRotation = FRotator(0, NewCameraRotation.Yaw, 0);
-
-	m_pMesh_WeaponHolder->SetRelativeRotation(NewCameraRotation);
-	//m_pCamera->SetRelativeRotation(FRotator(0, 0, 0));
-
-	m_fRecoilAngle -= m_fRecoilDecreaseRate * GetWorld()->GetDeltaSeconds();
-	m_fRecoilAngle = FMath::Max(m_fRecoilAngle, 0.0f);
-}
-
-
-
+#pragma endregion
 
 // Called when the game starts or when spawned
 void APlayerPawn::BeginPlay()
@@ -285,46 +267,15 @@ void APlayerPawn::BeginPlay()
 	Super::BeginPlay();
 
 	m_bCanMove = false;
-	DisableShooting();
-	
+	m_bCanShoot = false;
 	m_pGameDataManager = UGameDataManager::Instantiate(*this);
-
 	m_pInput->SetViewTarget(this);
-
-	FString WidgetPath = TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/WP_Crosshair.WP_Crosshair'");
-	UE_LOG(LogTemp, Warning, TEXT("Text1"));
-
-	if (!CrosshairWidgetClass)
-	{
-		CrosshairWidgetClass = LoadClass<UUserWidget>(nullptr, *WidgetPath);
-
-		if(CrosshairWidgetClass)
-		UE_LOG(LogTemp, Warning, TEXT("Hello, Text2"));
-		// Erstellen Sie das Widget und weisen Sie es der CrosshairWidgetInstance zu
-		CrosshairWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), CrosshairWidgetClass);
-		if (CrosshairWidgetInstance)
-		{
-			// Fügen Sie das Widget zum Viewport hinzu
-			CrosshairWidgetInstance->AddToViewport();
-		}
-	}
-
-	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	CollisionComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
 }
 
 // Called every frame
 void APlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	/*if (m_bCanMove)
-	{
-		MovePlayer(DeltaTime);
-	}*/
 
 	if (m_pGameDataManager)
 	{
@@ -336,14 +287,8 @@ void APlayerPawn::Tick(float DeltaTime)
 	}
 
 	GetMousePositions();
+	UpdateCrosshair();
 
-	if (CrosshairWidgetInstance)
-	{
-		FVector2D ViewportSize;
-		GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
-		FVector2D CrosshairPosition = FVector2D(ViewportSize.X / 2.0f, ViewportSize.Y / 2.0f);
-		CrosshairWidgetInstance->SetPositionInViewport(CrosshairPosition);
-	}
 }
 
 void APlayerPawn::OnPickUpEvent()
