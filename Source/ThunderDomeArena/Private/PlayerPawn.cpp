@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "GameDataManager.h"
+#include "Components/CapsuleComponent.h"
 #include "UIFunctionLibrary.h"
 #include "Sound/SoundCue.h"
 
@@ -20,7 +21,7 @@ APlayerPawn::APlayerPawn()
 	InitComponents();
 	InitCrosshair();
 
-	
+	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 #pragma region InitComponents
@@ -130,22 +131,26 @@ void APlayerPawn::InitCrosshair(void)
 
 void APlayerPawn::MovePlayer(float a_fDeltaTime)
 {
-	auto rotation = GetActorRotation() + (m_baseRotation * m_fRotationSpeed * a_fDeltaTime);
-	SetActorRotation(rotation);
+	if (m_bIsTurning) 
+	{
+		auto rotation = GetActorRotation() + FRotator(0.0f,m_fRotationInput,0.0f) * a_fDeltaTime;
+		SetActorRotation(rotation);
+		/*FRotator RotationToAdd(rotation);
+		FTransform CurrentTransform = m_pMesh_Base->GetComponentTransform();
+		FTransform NewTransform = FTransform(RotationToAdd) * CurrentTransform;
 
-	/*FRotator RotationToAdd(rotation);
-	FTransform CurrentTransform = m_pMesh_Base->GetComponentTransform();
-	FTransform NewTransform = FTransform(RotationToAdd) * CurrentTransform;
+		m_pMesh_Base->SetWorldTransform(NewTransform);
+		SetActorTransform(NewTransform);*/
+	}
 
-	m_pMesh_Base->SetWorldTransform(NewTransform);*/
-	//SetActorTransform(NewTransform);
+	
 	
 
 
-	//FVector forwardVector = GetActorRightVector();
+	FVector forwardVector = GetActorRightVector();
 
-	//auto location = GetActorLocation() + forwardVector * m_fSpeed * a_fDeltaTime;
-	//SetActorLocation(location);
+	auto location = GetActorLocation() + forwardVector * m_fSpeed * a_fDeltaTime;
+	SetActorLocation(location);
 }
 
 
@@ -179,7 +184,18 @@ void APlayerPawn::HandleForwardMoving(float a_fInput)
 
 void APlayerPawn::HandleRightMoving(float a_fInput)
 {
-	//m_baseRotation.Yaw = a_fInput;
+	m_baseRotation.Yaw = a_fInput;
+
+	if (a_fInput != 0.0f)
+	{
+		m_bIsTurning = true;
+		m_fRotationInput = a_fInput > 0.0f ? m_fRotationSpeed : -m_fRotationSpeed;
+	}
+	else
+	{
+		m_bIsTurning = false;
+		m_fRotationInput = 0.0f;
+	}
 }
 
 void APlayerPawn::OpenMenuAction()
@@ -281,13 +297,14 @@ void APlayerPawn::Tick(float DeltaTime)
 	{
 		if (!m_pGameDataManager->GetIsPaused())
 		{
-			MovePlayer(DeltaTime);
+			//MovePlayer(DeltaTime);
 			EnableShooting();
 		}
 	}
+	MovePlayer(DeltaTime);
 
 	GetMousePositions();
-	UpdateCrosshair();
+	//UpdateCrosshair();
 
 }
 

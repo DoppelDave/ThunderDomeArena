@@ -122,12 +122,14 @@ private:
 	float m_fShotCooldown = 0.1f;
 	bool m_bCanShoot = true;
 	bool m_bCanMove = true;
+	bool m_bIsTurning = false;
 
 	float m_fMousePosX;
 	float m_fMousePosY;
 	float m_fRecoilAngle = 0.0f;
 	float m_fRecoilDecreaseRate = 6.f;
 	float m_fRecoilAmount = 0.5f;
+	float m_fRotationInput;
 
 	UPROPERTY(EditAnywhere,
 		meta = (DisplayName = "Input", Category = "GameMode"))
