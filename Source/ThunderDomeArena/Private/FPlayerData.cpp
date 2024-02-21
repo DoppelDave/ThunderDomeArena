@@ -5,7 +5,8 @@
 
 FPlayerData::FPlayerData()
 {
-	fHealth = 100.0f;
+	fMaxHealth = 100.0f;
+	fHealth = 50.0f;
 	fShield = 50.0f;
 }
 

@@ -6,6 +6,12 @@
 #include "GameFramework/Actor.h"
 #include "PickUp.generated.h"
 
+enum class EPickUpType : uint8
+{
+	None,
+	HealthPickUp,
+	ShieldPickUp
+};
 
 UCLASS()
 class THUNDERDOMEARENA_API APickUp : public AActor
@@ -16,13 +22,16 @@ public:
 	// Sets default values for this actor's properties
 	APickUp();
 
+
 private:
-	void InitComponents(void);
+	void InitComponents(FString a_fMeshPath, FString a_fMeshName, FString a_fMaterialPath);
 	void CreateTrigger(UStaticMeshComponent* a_pMesh);
-	void InitMaterial(void);
 	void PlayParticleEffect(void);
 	void PlaySound(void);
-	UStaticMeshComponent* InitWeaponMesh(void);
+	void Rotate(float DeltaTime);
+	UStaticMeshComponent* InitMesh(FString a_fMeshPath, FString a_fMeshName);
+	UMaterialInterface* InitMaterial(FString a_fPath);
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -33,6 +42,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void SetPickUpType(EPickUpType a_pickUpType);
+	void Spawn();
 	
 	UFUNCTION()
 	void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -43,9 +55,24 @@ private:
 
 	const FString M_S_MAT = TEXT("/Script/Engine.Material'/Game/Materials/M_Black.M_Black'");
 	const FString M_S_MESH_WEAPON_2 = TEXT("/Script/Engine.StaticMesh'/Game/Meshes/Weapon_2.Weapon_2'");
-	const FString M_S_MESH_WEAPON_2_NAME = TEXT("Weapon");
 	const FString M_S_PARTICLE = TEXT("/Script/Engine.ParticleSystem'/Game/Particles/P_Explosion.P_Explosion'");
 	const FString M_S_PICK_UP_SOUND = TEXT("/Script/Engine.SoundWave'/Game/Audio/PickUp_1.PickUp_1'");
+
+	const FString M_S_SPU = TEXT("/Script/Engine.StaticMesh'/Game/Meshes/ShieldPickUp.ShieldPickUp'");
+	const FString M_S_SPU_MAT = (TEXT("/Script/Engine.Material'/Game/Materials/M_Blue.M_Blue'"));
+
+	const FString M_S_HPU = TEXT("/Script/Engine.StaticMesh'/Game/Meshes/HealthPickUp.HealthPickUp'");
+	const FString M_S_HPU_MAT = TEXT("/Script/Engine.Material'/Game/Materials/M_Green.M_Green'");
+
+	const FString M_S_MESH_SPU_NAME = TEXT("Shield Pick Up");
+	const FString M_S_MESH_HPU_NAME = TEXT("Health Pick Up");
+	const FString M_S_MESH_WEAPON_2_NAME = TEXT("Weapon");
+
+
+	//member
+	float m_fRotationSpeed = 90.0f;
+
+	EPickUpType m_pickUpType = EPickUpType::None;
 
 	// Materials & Meshes
 	UPROPERTY(EditAnywhere,

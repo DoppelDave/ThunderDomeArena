@@ -13,12 +13,12 @@ ABoxActor::ABoxActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	InitComponents();
+	//InitComponents();
 }
 
 void ABoxActor::InitComponents()
 {
-	m_pMaterial = FindObject<UMaterialInterface>(*M_S_MAT);
+	if (!m_pMaterial) m_pMaterial = FindObject<UMaterialInterface>(*M_S_MAT);
 	if (!m_pMesh) m_pMesh = InitWeaponMesh();
 }
 

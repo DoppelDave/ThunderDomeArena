@@ -9,6 +9,7 @@
 #include "Components/CapsuleComponent.h"
 #include "UIFunctionLibrary.h"
 #include "Sound/SoundCue.h"
+#include "PlayerHud.h"
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -17,10 +18,12 @@ APlayerPawn::APlayerPawn()
 	PrimaryActorTick.bCanEverTick = true;
 
 	m_pInput = Cast<AInputController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//PlayerHUDInstance = Cast<APlayerHud>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
 	InitComponents();
 	InitCrosshair();
 
+	Playerdata = FPlayerData();
 	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
@@ -110,7 +113,7 @@ void APlayerPawn::InitComponents(void)
 	if (!m_pMesh_WeaponHolder) m_pMesh_WeaponHolder = InitWeaponBaseMesh();
 	if (!m_pMesh_Weapon) m_pMesh_Weapon = InitWeaponMesh();
 	if (!m_pCamera) m_pCamera = InitCamera();
-	if (!m_pMesh_2_Weapon) m_pMesh_2_Weapon = InitWeapon2Mesh();
+	//if (!m_pMesh_2_Weapon) m_pMesh_2_Weapon = InitWeapon2Mesh();
 }
 
 void APlayerPawn::InitCrosshair(void)
@@ -233,6 +236,11 @@ void APlayerPawn::ShootBullets()
 	m_fRecoilAngle = m_fRecoilAmount;
 }
 
+void APlayerPawn::SetData()
+{
+
+}
+
 void APlayerPawn::AimAction()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Aim"));
@@ -274,6 +282,10 @@ float APlayerPawn::GetHealth() const
 void APlayerPawn::SetHealth(float a_fHealth)
 {
 	Playerdata.fHealth = a_fHealth;
+}
+float APlayerPawn::GetMaxHealth() const
+{
+	return Playerdata.fMaxHealth;
 }
 #pragma endregion
 

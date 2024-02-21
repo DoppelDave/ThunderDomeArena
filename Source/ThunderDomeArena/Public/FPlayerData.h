@@ -16,6 +16,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
 	float fHealth;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	float fMaxHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	float fShield;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
 	float fSpeed;

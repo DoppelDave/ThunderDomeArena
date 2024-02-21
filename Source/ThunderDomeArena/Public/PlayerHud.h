@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "FPlayerData.h"
 #include "PlayerHud.generated.h"
 
 /**
@@ -18,12 +19,16 @@ public:
 	APlayerHud();
 
 	virtual void BeginPlay() override;
+	void UpdateHealthbar(float a_fHealth, float a_fMaxHealth);
 
+
+protected:
 	UPROPERTY()
 	TSubclassOf<UUserWidget> HUDWidgetClass;
 
 	UPROPERTY()
-	UUserWidget* CurrentWidget;
+	UUserWidget* CurrentWidget = nullptr;
 
-private:
+	UPROPERTY()
+	class UProgressBar* HealthBar = nullptr;
 };

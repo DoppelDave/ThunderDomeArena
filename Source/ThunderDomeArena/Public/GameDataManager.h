@@ -22,6 +22,8 @@ public:
 	//Getter/Setter
 	AUIManager* GetUIManager(void);
 	void SetUIManager(AUIManager* a_pUI);
+	/*APlayerPawn* GetPlayerPawn(void);
+	void SetPlayerPawn(APlayerPawn* a_pPlayerPawn);*/
 	bool GetIsPaused();
 	void SetIsPaused(bool a_bIsPaused);
 
@@ -32,5 +34,7 @@ private:
 	
 	//member
 	class AUIManager* m_pUI = nullptr;
+	//class APlayerPawn* m_pPlayerPawn = nullptr;
+
 	bool m_bIsPaused = false;
 };

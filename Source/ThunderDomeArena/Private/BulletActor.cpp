@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+#include "BulletActor.h"
 #include "ActorUtils.h"
 #include "Components/BoxComponent.h"
-#include "BulletActor.h"
 
 // Sets default values
 ABulletActor::ABulletActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-if(!m_pMesh) m_pMesh = InitBaseMesh();
+	if(!m_pMesh) m_pMesh = InitBaseMesh();
 	
 	m_fSpeed = 5000.0f;
 

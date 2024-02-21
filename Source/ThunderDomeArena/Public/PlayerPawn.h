@@ -24,6 +24,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BLueprintReadOnly, Category = "PlayerData")
 	FPlayerData Playerdata;
+
+	UFUNCTION(BlueprintCallable, Category = "Player Data")
+	float GetHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Player Data")
+	void SetHealth(float a_fHealth);
+
+	UFUNCTION(BlueprintCallable, Category = "Player Data")
+	float GetMaxHealth() const;
 private:
 
 	//Initialize
@@ -40,6 +49,7 @@ private:
 	void EnableShooting();
 	void EnableMovement();
 	void ShootBullets();
+	void SetData();
 
 
 	// Callbacks
@@ -61,13 +71,10 @@ private:
 	UPROPERTY()
 	UUserWidget* CrosshairWidget;
 
+	UPROPERTY()
+	class APlayerHud* PlayerHUDInstance;
+
 	
-
-	UFUNCTION(BlueprintCallable, Category = "Player Data")
-	float GetHealth() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Player Data")
-	void SetHealth(float a_fHealth);
 
 protected:
 	// Called when the game starts or when spawned

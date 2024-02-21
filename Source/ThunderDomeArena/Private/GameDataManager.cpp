@@ -39,6 +39,16 @@ void UGameDataManager::SetUIManager(AUIManager* a_pUI)
 	m_pUI = a_pUI;
 }
 
+//APlayerPawn* UGameDataManager::GetPlayerPawn(void)
+//{
+//	return m_pPlayerPawn;
+//}
+//
+//void UGameDataManager::SetPlayerPawn(APlayerPawn* a_pPlayerPawn)
+//{
+//	m_pPlayerPawn = a_pPlayerPawn;
+//}
+
 bool UGameDataManager::GetIsPaused()
 {
 	return m_bIsPaused;

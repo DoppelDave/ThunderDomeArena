@@ -10,19 +10,51 @@
 APickUp::APickUp()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	InitComponents();
+	Spawn();
 }
 
-void APickUp::InitComponents(void)
+void APickUp::Spawn()
 {
-	InitMaterial();
-	InitWeaponMesh();
+	float fRandomValue = FMath::FRandRange(0.0f, 1.0f);
+
+	m_pickUpType = (fRandomValue < 0.5f) ? EPickUpType::ShieldPickUp : EPickUpType::HealthPickUp;
+
+
+	switch (m_pickUpType)
+	{
+	case EPickUpType::ShieldPickUp:
+		InitComponents(*M_S_SPU, *M_S_MESH_SPU_NAME, *M_S_SPU_MAT);
+		break;
+	case EPickUpType::HealthPickUp:
+		InitComponents(*M_S_HPU, *M_S_MESH_HPU_NAME, *M_S_HPU_MAT);
+		break;
+	default:
+		break;
+
+	};
 }
 
-void APickUp::InitMaterial(void)
+void APickUp::InitComponents(FString a_fMeshPath, FString a_fMeshName, FString a_fMaterialPath)
 {
-	m_pMaterial = FindObject<UMaterialInterface>(*M_S_MAT);
+	if (!m_pMaterial) m_pMaterial = InitMaterial(a_fMaterialPath);
+	if (!m_pMesh) m_pMesh = InitMesh(a_fMeshPath, a_fMeshName);
+}
+
+UMaterialInterface* APickUp::InitMaterial(FString a_fPath)
+{
+	auto pMaterial = FindObject<UMaterialInterface>(*a_fPath);
+	return pMaterial;
+}
+
+
+UStaticMeshComponent* APickUp::InitMesh(FString a_fMeshPath, FString a_fMeshName)
+{
+	auto pMesh = CreateDefaultSubobject<UStaticMeshComponent>(*a_fMeshName);
+	pMesh->SetupAttachment(RootComponent);
+	pMesh->SetStaticMesh(FindObject<UStaticMesh>(*a_fMeshPath));
+	pMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	pMesh->SetMaterial(0, m_pMaterial);
+	return pMesh;
 }
 
 void APickUp::PlayParticleEffect(void)
@@ -43,19 +75,13 @@ void APickUp::PlaySound(void)
 	}
 }
 
-UStaticMeshComponent* APickUp::InitWeaponMesh(void)
+void APickUp::Rotate(float DeltaTime)
 {
-	auto pMesh_Weapon = CreateDefaultSubobject<UStaticMeshComponent>(*M_S_MESH_WEAPON_2_NAME);
+	FRotator newRotation = FRotator(0.0f, m_fRotationSpeed * DeltaTime, 0.0f);
 
-	pMesh_Weapon->SetupAttachment(RootComponent);
-	pMesh_Weapon->SetStaticMesh(FindObject<UStaticMesh>(*M_S_MESH_WEAPON_2));
-	pMesh_Weapon->SetRelativeLocation(FVector(0.0f, 0.0f, -50.0f));
-	pMesh_Weapon->SetMaterial(0, m_pMaterial);
-
-	CreateTrigger(pMesh_Weapon);
-
-	return pMesh_Weapon;
+	AddActorLocalRotation(newRotation);
 }
+
 
 void APickUp::CreateTrigger(UStaticMeshComponent* a_pMesh)
 {
@@ -75,6 +101,12 @@ void APickUp::BeginPlay()
 void APickUp::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	Rotate(DeltaTime);
+}
+
+void APickUp::SetPickUpType(EPickUpType a_pickUpType)
+{
+	m_pickUpType = a_pickUpType;
 }
 
 void APickUp::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
