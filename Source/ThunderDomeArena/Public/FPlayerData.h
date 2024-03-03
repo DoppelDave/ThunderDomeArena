@@ -21,6 +21,8 @@ public:
 	float fShield;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
 	float fSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
+	float fScore;
 
 	FPlayerData();
 	~FPlayerData();

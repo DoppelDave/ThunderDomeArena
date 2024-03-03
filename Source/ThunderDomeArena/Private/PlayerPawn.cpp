@@ -18,13 +18,11 @@ APlayerPawn::APlayerPawn()
 	PrimaryActorTick.bCanEverTick = true;
 
 	m_pInput = Cast<AInputController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	//PlayerHUDInstance = Cast<APlayerHud>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	Playerdata = FPlayerData();
 
 	InitComponents();
 	InitCrosshair();
 
-	Playerdata = FPlayerData();
-	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 #pragma region InitComponents
@@ -98,11 +96,11 @@ UStaticMeshComponent* APlayerPawn::InitWeaponMesh(void)
 
 UCameraComponent* APlayerPawn::InitCamera(void)
 {
-	m_pCamera = CreateDefaultSubobject<UCameraComponent>(*M_S_CAMERA_NAME);
-	m_pCamera->SetupAttachment(m_pMesh_WeaponHolder);
-	m_pCamera->SetRelativeLocation(m_cameraLocation);
-	m_pCamera->SetRelativeRotationExact(m_cameraRotation);
-	return m_pCamera;
+	auto pCamera = CreateDefaultSubobject<UCameraComponent>(*M_S_CAMERA_NAME);
+	pCamera->SetupAttachment(m_pMesh_WeaponHolder);
+	pCamera->SetRelativeLocation(m_cameraLocation);
+	pCamera->SetRelativeRotationExact(m_cameraRotation);
+	return pCamera;
 }
 
 void APlayerPawn::InitComponents(void)
@@ -239,6 +237,21 @@ void APlayerPawn::ShootBullets()
 void APlayerPawn::SetData()
 {
 
+}
+
+void APlayerPawn::LoadEndScreen()
+{
+	static ConstructorHelpers::FClassFinder<UUserWidget>HUDWidgetClassFinder(*M_S_ENDSCREEN);
+	HUDWidgetClass = HUDWidgetClassFinder.Class;
+	if (HUDWidgetClass)
+	{
+		EndScreenWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetClass);
+
+		if (EndScreenWidget)
+		{
+			EndScreenWidget->AddToViewport();
+		}
+	}
 }
 
 void APlayerPawn::AimAction()

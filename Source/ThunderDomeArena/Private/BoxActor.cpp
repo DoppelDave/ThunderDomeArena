@@ -13,13 +13,13 @@ ABoxActor::ABoxActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	//InitComponents();
+	InitComponents();
 }
 
 void ABoxActor::InitComponents()
 {
-	if (!m_pMaterial) m_pMaterial = FindObject<UMaterialInterface>(*M_S_MAT);
-	if (!m_pMesh) m_pMesh = InitWeaponMesh();
+	if (!m_pMaterial) m_pMaterial = InitMaterial();
+	if (!m_pMesh) m_pMesh = InitMesh();
 }
 
 void ABoxActor::CreateTrigger(UStaticMeshComponent* a_pMesh)
@@ -30,18 +30,24 @@ void ABoxActor::CreateTrigger(UStaticMeshComponent* a_pMesh)
 	m_pTriggerBox->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 }
 
-UStaticMeshComponent* ABoxActor::InitWeaponMesh(void)
+UMaterialInterface* ABoxActor::InitMaterial(void)
 {
-	auto pMesh_Weapon = CreateDefaultSubobject<UStaticMeshComponent>(*M_S_MESH_NAME);
+	auto pMaterial = FindObject<UMaterialInterface>(*M_S_MAT);
+	return pMaterial;
+}
 
-	pMesh_Weapon->SetupAttachment(RootComponent);
-	pMesh_Weapon->SetStaticMesh(FindObject<UStaticMesh>(*M_S_MESH));
-	pMesh_Weapon->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	pMesh_Weapon->SetMaterial(0, m_pMaterial);
-	CreateTrigger(pMesh_Weapon);
+UStaticMeshComponent* ABoxActor::InitMesh(void)
+{
+	auto pMesh = CreateDefaultSubobject<UStaticMeshComponent>(*M_S_MESH_NAME);
+
+	pMesh->SetupAttachment(RootComponent);
+	pMesh->SetStaticMesh(FindObject<UStaticMesh>(*M_S_MESH));
+	pMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	pMesh->SetMaterial(0, m_pMaterial);
+	//CreateTrigger(pMesh);
 	
 
-	return pMesh_Weapon;
+	return pMesh;
 }
 
 void ABoxActor::OnBulletHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

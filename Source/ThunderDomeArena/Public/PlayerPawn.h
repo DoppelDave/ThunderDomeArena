@@ -33,6 +33,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Player Data")
 	float GetMaxHealth() const;
+
+	void LoadEndScreen();
 private:
 
 	//Initialize
@@ -50,7 +52,6 @@ private:
 	void EnableMovement();
 	void ShootBullets();
 	void SetData();
-
 
 	// Callbacks
 	void HandleForwardMoving(float a_fInput);
@@ -70,6 +71,10 @@ private:
 
 	UPROPERTY()
 	UUserWidget* CrosshairWidget;
+
+	UPROPERTY()
+	UUserWidget* EndScreenWidget;
+
 
 	UPROPERTY()
 	class APlayerHud* PlayerHUDInstance;
@@ -100,6 +105,7 @@ private:
 	const FString M_S_MAT_DEC = TEXT("/Script/Engine.Material'/Game/Materials/M_Basic_Floor.M_Basic_Floor'");
 	const FString M_S_MAT_WIN = TEXT("/Script/Engine.Material'/Game/Materials/M_Basic_Floor.M_Basic_Floor'");
 
+	const FString M_S_ENDSCREEN = TEXT("WidgetBlueprint'/Game/Blueprints/WP_End");
 	const FString M_S_CROSSHAIR = TEXT("WidgetBlueprint'/Game/Blueprints/WP_Crosshair'");
 	const FString M_S_MESH_BASE = TEXT("/Script/Engine.StaticMesh'/Game/Meshes/Car.Car'");
 	const FString M_S_MESH_WEAPON_BASE = TEXT("/Script/Engine.StaticMesh'/Game/Meshes/Weapon_Weapon_Holder.Weapon_Weapon_Holder'");
@@ -194,4 +200,9 @@ private:
 	TSubclassOf<class UUserWidget> CrosshairWidgetClass;
 
 	UUserWidget* CrosshairWidgetInstance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "EndGame")
+	TSubclassOf<class UUserWidget> EndScreenWidgetClass;
+
+	UUserWidget* EndScreenInstance;
 };

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "FPlayerData.h"
+
 #include "BulletActor.generated.h"
 
 UCLASS()
@@ -13,19 +15,20 @@ class THUNDERDOMEARENA_API ABulletActor : public AActor
 	
 public:	
 	// Sets default values for this actor's properties
-	ABulletActor();
+	ABulletActor(FPlayerData* a_pData);
 	
-	//UFUNCTION()
-	//void OnBulletHit(UPrimitiveComponent* HitComonent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION()
+	void OnBulletHit(UPrimitiveComponent* HitComonent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 private:
 	void InitMaterial(void);
-	//void CreateTrigger(UStaticMeshComponent* a_pMesh);
+	void CreateTrigger(UStaticMeshComponent* a_pMesh);
 	UStaticMeshComponent* InitBaseMesh(void);
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 	float m_fSpeed = 100.0f;
 
 public:	
@@ -37,7 +40,7 @@ private:
 	const FString M_S_MESH_BULLET = TEXT("/Script/Engine.StaticMesh'/Game/Meshes/Bullet.Bullet'");
 	const FString M_S_MESH_BULLET_NAME = TEXT("Bullet");
 
-	//class UBoxComponent* m_pTriggerBox;
+	class UBoxComponent* m_pTriggerBox;
 
 	// Materials & Meshes
 	UPROPERTY(EditAnywhere,
@@ -47,4 +50,6 @@ private:
 	UPROPERTY(EditAnywhere,
 		meta = (DisplayName = "BaseMesh", Category = "Components"))
 	TObjectPtr<UStaticMeshComponent> m_pMesh = nullptr;
+
+	FPlayerData* m_pPlayerdata = nullptr;
 };

@@ -19,7 +19,8 @@ private:
 
 	void InitComponents();
 	void CreateTrigger(UStaticMeshComponent* a_pMesh);
-	UStaticMeshComponent* InitWeaponMesh(void);
+	UStaticMeshComponent* InitMesh(void);
+	UMaterialInterface* InitMaterial(void);
 
 	UFUNCTION()
 	void OnBulletHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
@@ -35,7 +36,7 @@ public:
 
 private:
 
-	const FString M_S_MAT = TEXT("/Script/Engine.Material'/Game/Meshes/Material.Material'");
+	const FString M_S_MAT = TEXT("/Script/Engine.Material'/Game/Meshes/Material");
 	const FString M_S_MESH = TEXT("/Script/Engine.StaticMesh'/Game/Meshes/Box_3.Box_3'");
 	const FString M_S_MESH_NAME = TEXT("Box");
 
